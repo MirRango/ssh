@@ -62,8 +62,77 @@
     
     
     
-    
-    
+ ==================
+ Create and copy ssh private and public key.
 ssh-keygen -t rsa
 ssh-copy-id x@xxxx
 ssh -p x x@xxxx
+======================================
+
+
+
+
+
+=======================================================================================
+=========================================================================================
+
+
+
+sudo nano /etc/ssh/sshd_config
+PermitRootLogin no
+MaxAuthTries 3
+LoginGraceTime 20
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+KerberosAuthentication no
+GSSAPIAuthentication no
+X11Forwarding no
+PermitUserEnvironment no
+AllowAgentForwarding no
+AllowTcpForwarding no
+PermitTunnel no
+ DebianBanner no
+ ===
+Now validate the syntax of your new configuration by running sshd in test mode:
+sudo sshd -t
+If your configuration file has a valid syntax, there will be no output. In the event of a syntax error, there will be an output describing the issue.
+ ===
+ 
+                    Implementing an IP Address Allowlist
+                    
+ 
+     • Restrict all users to a specific IP address:
+AllowUsers *@203.0.113.1
+    • Restrict all users to a specific IP address range using Classless Inter-Domain Routing (CIDR) notation:
+AllowUsers *@203.0.113.0/24
+    • Restrict all users to a specific IP address range (using wildcards):
+AllowUsers *@203.0.113.*
+    • Restrict all users to multiple specific IP addresses and ranges:
+AllowUsers *@203.0.113.1 *@203.0.113.2 *@192.0.2.0/24 *@172.16.*.1
+    • Disallow all users except for named users from specific IP addresses:
+AllowUsers sammy@203.0.113.1 alex@203.0.113.2
+    • Restrict a specific user to a specific IP address, while continuing to allow all other users to log in without restrictions:
+Match User ashley
+  AllowUsers ashley@203.0.113.1
+  
+  AllowUsers *@203.0.113.1
+  
+==
+Save and close the file, and then proceed to test your configuration syntax:
+sudo sshd -t
+==
+
+
+                       Restricting the Shell of a User
+sudo adduser --shell /usr/sbin/nologin alex
+
+Alternatively, you can change the shell of an existing user to be nologin:
+sudo usermod --shell /usr/sbin/nologin sammy
+
+
+ssh/sshd.config
+Match User alex
+  ForceCommand internal-sftp
+  ChrootDirectory /home/alex/
+ 
